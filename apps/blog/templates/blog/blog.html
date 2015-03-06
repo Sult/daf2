@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load add_css %}
+
+{% block page_title %}DAF - Blog{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 col-md-offset-1">
+
+        {% for article in articles.object_list %}
+        <div>
+            <h2 class="page-header">{{ article.title }}</h2>
+            {{ article.body|safe }}
+            <p class="text-right"><i>Created {{ article.created }} by {{ article.author }}</i>&nbsp;&nbsp;&nbsp;<a href="{% url 'blog_article' article.slug %}">Comments</a></p>
+            <br>
+
+        </div>
+        {% endfor %}
+
+        <div id="pagination" class="text-center">
+            {{ articles.render }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

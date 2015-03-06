@@ -1,0 +1,35 @@
+Download database dumps
+images: https://developers.eveonline.com/resource/image-export-collection
+staticdump:https://www.fuzzwork.co.uk/dump/
+
+
+eveapi:
+package: https://github.com/ntt/eveapi
+tutorial: https://github.com/ntt/eveapi/blob/master/apitest.py
+
+
+
+eve api information
+https://neweden-dev.com/API
+http://wiki.eve-id.net/APIv2_Page_Index
+
+
+
+
+
+
+Create postgress database from dump
+sudo - postgres
+createdb daf_static
+createuser -P
+psql grant all privileges on database static to eve;
+pg_restore -d static /path/to/file
+http://www.postgresql.org/docs/9.1/static/app-pgrestore.html
+
+#cant drop db cause of open connection?
+http://stackoverflow.com/questions/5108876/kill-a-postgresql-session-connection
+
+on dev first migrate
+then migrate static and bulk
+then run migrations
+migrate default, static, bulk

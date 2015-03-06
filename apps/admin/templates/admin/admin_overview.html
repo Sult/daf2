@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block page_title %}DAF - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10">
+        <h2 class="page-header">Admin Overview</h2>
+        
+        <div class="row">
+        {% if new_registrations %}
+            <div class="col-md-3">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th colspan="2">Registrations</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in new_registrations %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td><a href="{% url 'user_confirm' user.pk %}">Confirm</a></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+        {% if inactive_dict %}
+            <div class="col-md-3">
+                Inactive Members
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Last Login</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in new_registrations %}
+                        <tr>
+                            <tr>{{ user.username }}</tr>
+                            <tr>{{ user.days_since_last_login }} Days ago</tr>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+        </div>
+        
+        
+        <br><br><br>
+    {% for key, articles in posts.items %}
+        {% if articles %}
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Last Created {{ key|title }} Articles</th>
+                    <th>Published</th>
+                    <th>Public</th>
+                    {% if key == "news" %}
+                        <th>Sticky</th>
+                    {% endif %}
+                    <th>Created</th>
+                    <th colspan="4">Author</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for article in articles %}
+                <tr>
+                    <td>{{ article.title }}{{ article.pk }}</td>
+                    <td>
+                        {% if article.published %}
+                        <i class="fa fa-fw fa-check"></i>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if article.public %}
+                        <i class="fa fa-fw fa-check"></i>
+                        {% endif %}
+                    </td>
+                    {% if key == "news" %}
+                    <td>
+                        {% if article.sticky %}
+                        <i class="fa fa-fw fa-check"></i>
+                        {% endif %}
+                    </td>
+                    {% endif %}
+                    
+                    <td>{{ article.created }}</td>
+                    <td>{{ article.author.username }}</td>
+                    <td><a href="{% url 'blog_edit' article.slug %}">Edit</a></td>
+                    <td><a href="{% url 'blog_preview' article.slug %}">Preview</a></td>
+                    <td><a class="delete" href="{% url 'blog_delete' article.pk %}">Delete</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+        <br><br><br>
+    {% endfor %}
+    
+    
+    </div>
+</div>
+{% endblock %}
+

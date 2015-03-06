@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load usergroups %}
+{% load staticfiles %}
+
+{% block page_title %}DAF - Users{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h3 class="page-header">User Control</h3>
+        
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Accepted</th>
+                        <th>Moderator</th>
+                        <th>Date Joined</th>
+                        <th colspan="2">Last Seen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for user in users %}
+                    {% if user.is_active %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>
+                        {% if user.usercontrol.confirmed %}
+                            <i class="fa fa-fw fa-check"></i>
+                        {% else %}
+                            <a href="{% url 'user_confirm' user.pk %}">Confirm</a>
+                        {% endif %}
+                        </td>
+                        <td>
+                        {% ifusergroup moderator %}
+                            <i class="fa fa-fw fa-check"></i>
+                        {% endifusergroup %}
+                        </td>
+                        <td>{{ user.date_joined }}</td>
+                        <td>{{ user.days_since_last_login }}</td>
+                        <td>
+                        {% ifusergroup moderator %}{% else %}
+                            <a class="delete" href="{% url 'user_delete' user.pk %}">Delete</a>
+                        {% endifusergroup %}
+                        </td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js%}
+<script type="text/javascript" src="{% static 'js/confirm_delete.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block page_title %}DAF - {{ name }} Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="page-header">{{ name }} Articles</h2>
+        
+        <a href="{% if name ==  'News' %}{% url 'news_create' %}{% else %}{% url 'blog_create' %}{% endif %}" class="btn btn-primary btn-md" role="button">New Article</a>
+        
+        {% if articles %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Published</th>
+                        <th>Public</th>
+                        {% if name == "News" %}
+                        <th>Sticky</th>
+                        {% endif %}
+                        <th>Created</th>
+                        <th>Modified</th>
+                        <th colspan="4">Author</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for article in articles %}
+                    <tr>
+                        <td>{{ article.title }}{{ article.pk }}</td>
+                        <td>
+                            {% if article.published %}
+                            <i class="fa fa-fw fa-check"></i>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if article.public %}
+                            <i class="fa fa-fw fa-check"></i>
+                            {% endif %}
+                        </td>
+                        {% if name == "News" %}
+                        <td>
+                            {% if article.sticky %}
+                            <i class="fa fa-fw fa-check"></i>
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                        
+                        <td>{{ article.created }}</td>
+                        <td>{{ article.modified }}</td>
+                        <td>{{ article.author.username }}</td>
+                        <td><a href="{% if name ==  'News' %}{% url 'news_edit' article.slug %}{% else %}{% url 'blog_edit' article.slug %}{% endif %}">Edit</a></td>
+                        <td><a href="{% url 'blog_preview' article.slug %}">Preview</a></td>
+                        <td><a class="delete" href="{% url 'blog_delete' article.pk %}">Delete</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block js%}
+<script type="text/javascript" src="{% static 'js/confirm_delete.js' %}"></script>
+{% endblock %}

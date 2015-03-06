@@ -1,0 +1,35 @@
+{% load url_resolvers %}
+<div class="collapse navbar-collapse navbar-ex1-collapse">
+    <ul class="nav navbar-nav side-nav">
+        <li>
+            <a href="{% url 'index' %}"><i class="fa fa-fw fa-university"></i> News</a>
+        </li>
+        <li>
+            <a href="{% url 'blog' %}"><i class="fa fa-fw fa-comment"></i> Deno's Blog</a>
+        </li>
+        <li>
+            <a href="#"><i class="fa fa-fw fa-tags"></i> Forum</a>
+        </li>
+        <li {% if request.path == 'characters'|find_url %} class="active"{% endif %}>
+            <a href="{% url 'characters' %}"><i class="fa fa-fw fa-users"></i> Characters</a>
+        </li>
+        <li>
+    {% if "charpk" in request.session %}
+        {% include "characters/character_nav_bar.html" %}
+    {% endif %} {#For if request.session.charpk #}
+
+        <li>
+            &nbsp;
+        </li>
+        <li {% if "/library/" in request.path %} class="active" {% endif %} >
+            <a href="javascript:;" data-toggle="collapse" data-target="#library">
+                <i class="fa fa-fw fa-folder-open-o"></i> Library<i class="fa fa-fw fa-caret-down"></i>
+            </a>
+            <ul id="library" class="{% if not '/library/' in request.path %}collapse{% endif %}">
+                <li>
+                    <a href="{% url 'tree' %}" ><i class="fa fa-fw fa-book"></i> Skilltree </a>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div>

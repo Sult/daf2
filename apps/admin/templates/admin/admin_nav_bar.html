@@ -1,0 +1,17 @@
+<div class="collapse navbar-collapse navbar-ex1-collapse">
+    <ul class="nav navbar-nav side-nav">
+        <li {% if request.path == "/admin/" %} class="active" {% endif %} >
+            <a href="{% url 'admin' %}"><i class="fa fa-fw fa-desktop"></i> Overview</a>
+        </li>
+        <li {% if request.path == "/admin/users/" %} class="active" {% endif %} >
+            <a href="{% url 'admin_users' %}"><i class="fa fa-fw fa-users"></i> Users</a>
+        </li>
+        <li {% if "/admin/news/" in request.path %} class="active" {% endif %} >
+            <a href="{% url 'news_admin' %}"><i class="fa fa-fw fa-info"></i> News Bulletin</a>
+        </li>
+        <li {% if "/admin/blog/" in request.path %} class="active" {% endif %} >
+            <a href="{% url 'blog_admin' %}"><i class="fa fa-fw fa-comment"></i> Deno's Blog</a>
+        </li>
+    </ul>
+</div>
+    

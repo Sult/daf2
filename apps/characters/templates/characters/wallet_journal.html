@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load character_tags %}
+
+{% block page_title %}Wallet Journal{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <h2 class="page-header">Wallet Journal of {{ character.charactername }}</h2>
+
+        {% if transactions %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Balance</th>
+                </tr>
+                {% for t in transactions.object_list %}
+                <tr>
+                    <td>{{ t.date|convert_stamp }}</td>
+                    <td>{{ t.refTypeID|reftypename }}</td>
+                    <td class="{% if t.amount < 0 %}text-danger{% else %}text-success{% endif %}">{{ t.amount|intcomma }} ISK</td>
+                    <td class="{% if forloop.first %}text-success{% endif %}">
+                        {% if forloop.first %}<strong>{{ t.balance|intcomma }} ISK</strong>{% else %}{{ t.balance|intcomma }} ISK{% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+         <div id="pagination" class="text-center">
+            {{ transactions.render }}
+        </div>
+        {% else %}
+        <p>
+            You seem inactive! No balance changes in the last month.
+        </p>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

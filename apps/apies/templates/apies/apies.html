@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load add_css %}
+
+{% block page_title %}DAF - API Control{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h2 class="page-header">Manage APIs</h2>
+        <br>
+    {% if char_apies %}
+        <h4>Characters</h4>
+        {% include "apies/apies_table.html" with apies=char_apies %}
+    {% endif %}
+    {% if corp_apies %}
+        <h4>Corporations</h4>
+        {% include "apies/apies_table.html" with apies=corp_apies %}
+    {% endif %}
+    {% if not corp_apies and not char_apies %}
+        <p>
+            You have currently no APIs added.
+        </p>
+    {% endif %}
+        <a href="#" class="btn btn-primary btn-md" role="button" data-toggle="modal" data-target="#ApiModal">Add API</a>
+    </div>
+</div>
+
+
+{# Create add api modal #}
+{% include "apies/api_modal.html" %}
+{% endblock %}
+
+{# needed for errorhandeling form in modal #}
+{% block js%}
+<script type="text/javascript" src="{% static 'js/confirm_delete.js' %}"></script>
+{% if api_form.errors %}
+<script type="text/javascript">
+    $(function () {
+        $('#ApiModal').modal('show');
+    });
+</script>
+{% endif %}
+{% endblock %}

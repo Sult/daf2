@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block page_title %}DAF - {{ article.title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 col-md-offset-1">
+        <div>
+            <h2 class="page-header">{{ article.title }}</h2>
+            {{ article.body|safe }}
+            <p class="text-right">
+                <i>Created {{ article.created }} by {{ article.author }}</i>&nbsp;&nbsp;&nbsp;<a href="#">Reply</a>
+            </p>
+            <br>
+            
+        {% if comments %}
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                {% for comment in comments %}
+                    <div id="comment_{{ commnent.pk }}">
+                        <p>{{ comment.body }}</p>
+                        
+                    </div>
+                {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="{% static 'js/comment_form.js' %}"></script>
+{% endblock %}
