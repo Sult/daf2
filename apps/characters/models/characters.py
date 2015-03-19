@@ -8,8 +8,8 @@ from django.utils.timezone import utc
 from .skills import Skill, SkillGroup
 from apps.bulk.models import Corporation
 from config.storage import OverwriteStorage
-from utils import connection
-from utils.connection import set_cache, get_cache
+#from utils import connection
+import utils
 from utils.common import convert_timestamp, icon_size_name, lookahead
 
 
@@ -43,7 +43,7 @@ class CharacterApi(models.Model):
 
     #get the data for landing page after character selection
     def character_sheet(self):
-        sheet = getattr(connection, "characterinfo_api")(self)
+        sheet = utils.connection.api_request("CharacterInfoAuth", obj=self)
         employment = self.employment_history(sheet)
         return sheet, employment
 
@@ -51,7 +51,7 @@ class CharacterApi(models.Model):
     @staticmethod
     def employment_history(sheet):
         cache_key = "employment_history_%d" % sheet.characterID
-        result = get_cache(cache_key)
+        result = utils.connection.get_cache(cache_key)
         if not result:
             cache_timer = 60 * 60
             result = []
@@ -64,14 +64,16 @@ class CharacterApi(models.Model):
                         corp_data.startDate
                     )
                 })
-            set_cache(cache_key, result, cache_timer)
+            utils.connection.set_cache(cache_key, result, cache_timer)
         return result
 
     #get skill in training
     def skill_in_training(self):
         training_skill = None
         if self.api.access_to("SkillInTraining"):
-            in_training = getattr(connection, "skillintraining")(self)
+            in_training = utils.connection.api_request(
+                "SkillInTraining", obj=self
+            )
             try:
                 training_skill = {
                     "skill": Skill.objects.get(
@@ -89,10 +91,10 @@ class CharacterApi(models.Model):
     #characters trained skills
     def trained_skills(self):
         cache_key = "trained_skills_%d" % self.pk
-        result = get_cache(cache_key)
+        result = utils.connection.get_cache(cache_key)
         if not result:
-            cache_timer = 60 * 10
-            sheet = getattr(connection, "charactersheet")(self)
+            cache_timer = 60 * 5
+            sheet = utils.connection.api_request("CharacterSheet", obj=self)
             groups = SkillGroup.objects.exclude(
                 groupname="Fake Skills"
             ).order_by("groupname")
@@ -121,7 +123,7 @@ class CharacterApi(models.Model):
                 "skillpoints": skillpoints,
             }
 
-            set_cache(cache_key, result, cache_timer)
+            utils.connection.set_cache(cache_key, result, cache_timer)
         return result
 
     #get skillqueue
@@ -129,7 +131,10 @@ class CharacterApi(models.Model):
         queue = None
         if self.api.access_to("SkillQueue"):
             queue = {}
-            skills = getattr(connection, "skillqueue")(self)
+
+            skills = utils.connection.api_request(
+                "SkillQueue", obj=self
+            ).skillqueue
             queue["skills"] = skills
             queue["total"] = self.total_skillpoints(skills)
             now = datetime.now().replace(tzinfo=utc)
@@ -151,14 +156,16 @@ class CharacterApi(models.Model):
     #walletjournal (results can be increased and filtered)
     def wallet_journal(self):
         cache_key = "walletjournal_%d" % self.pk
-        result = get_cache(cache_key)
+        result = utils.connection.get_cache(cache_key)
         if not result:
             cache_timer = 60 * 5
-            transactions = getattr(connection, "walletjournal")(self)
+            transactions = utils.connection.api_request(
+                "WalletJournal", obj=self
+            ).transactions
             result = list()
             for transaction in transactions:
                 result.append(transaction)
-            set_cache(cache_key, result, cache_timer)
+            utils.connection.set_cache(cache_key, result, cache_timer)
         return result
 
 
@@ -194,3 +201,26 @@ class CharacterApiIcon(models.Model):
     @staticmethod
     def icon_sizes():
         return [32, 64, 128, 200, 256]
+
+
+class JournalEntries(models.Model):
+    """
+    Wallet transcations of a player. Saved to database so data can
+    be filtered, and metadata can be created.
+    Like balance graphs, see how much you paid in taxes and more.
+    """
+
+    date = models.DateTimeField()
+    refid = models.BigIntegerField()
+    reftypeid = models.IntegerField()
+    ownername1 = models.CharField(max_length=254)
+    ownerid1 = models.IntegerField()
+    ownername2 = models.CharField(max_length=254)
+    ownerid2 = models.IntegerField()
+    argname1 = models.CharField(max_length=254)
+    argid1 = models.IntegerField()
+    amount = models.DecimalField(max_digits=19, decimal_places=2)
+    balance = models.DecimalField(max_digits=19, decimal_places=2)
+    reason = models.TextField(blank=True)
+    taxreceiverid = models.IntegerField()
+    taxamount = models.DecimalField(max_digits=19, decimal_places=2)

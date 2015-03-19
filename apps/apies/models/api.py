@@ -6,7 +6,7 @@ from django.utils import timezone
 
 from .accessmask import Call
 from utils.common import convert_timestamp, lookahead
-from utils import connection
+import utils
 
 
 class Api(models.Model):
@@ -35,13 +35,15 @@ class Api(models.Model):
     #update api and remake related models
     def update(self):
         #update api fields
-        key = getattr(connection, "apikeyinfo")(self)
-        self.accounttype = key.type
-        self.expires = convert_timestamp(key.expires)
-        self.accessmask = key.accessMask
+        info = utils.connection.api_request("ApiKeyInfo", api=self)
+        self.accounttype = info.key.type
+        self.expires = convert_timestamp(info.key.expires)
+        self.accessmask = info.key.accessMask
         self.save()
 
         #delete and recreate related character/corp models
+        #TODO: instead of recreating, update the characters still
+        # available in api
         self.delete_related()
         self.create_related()
 
@@ -67,21 +69,22 @@ class Api(models.Model):
 
     #create onetoone Corporation object
     def create_corporation(self):
-        info = getattr(connection, "apikeyinfo")(self)
-        for corp in info.characters:
+        info = utils.connection.api_request("ApiKeyInfo", api=self)
+        for corp in info.key.characters:
             try:
                 get_model("corporations", "CorporationApi").objects.create(
                     api=self,
                     corporationid=corp.corporationID,
                     corporationname=corp.corporationName,
+                    characterid=corp.characterID,
                 )
             except IntegrityError:
                 print "Api tries to create more than 1 Corporation object"
 
     #create related Character objects (1 or 3)
     def create_characters(self):
-        info = getattr(connection, "apikeyinfo")(self)
-        for char in info.characters:
+        info = utils.connection.api_request("ApiKeyInfo", api=self)
+        for char in info.key.characters:
             new = get_model("characters", "CharacterApi").objects.create(
                 api=self,
                 characterid=char.characterID,
@@ -90,10 +93,10 @@ class Api(models.Model):
                 corporationname=char.corporationName,
             )
 
-            getattr(connection, 'update_icons')(
+            utils.connection.update_icons(
                 new,
                 new.characterid,
-                "Character"
+                "Character",
             )
 
     #create a name for the api
@@ -147,6 +150,6 @@ class Api(models.Model):
     #some simple account information
     def account_status(self):
         if self.access_to("AccountStatus"):
-            info = getattr(connection, "accountstatus")(self)
+            info = utils.connection.api_request("AccountStatus", api=self)
             return info
         return None

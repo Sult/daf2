@@ -4,7 +4,7 @@ from collections import namedtuple
 from django.db import models
 from django.utils.timezone import utc
 
-from utils import connection
+#from utils import connection
 from apps.static.models import Crpnpccorporations, Invnames
 
 

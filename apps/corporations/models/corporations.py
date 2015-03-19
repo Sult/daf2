@@ -3,6 +3,7 @@ from django.db import models
 
 #from config.storage import OverwriteStorage
 #from utils.common import icon_size_name
+from utils.connection import *
 
 
 class CorporationApi(models.Model):
@@ -11,6 +12,7 @@ class CorporationApi(models.Model):
     api = models.OneToOneField('apies.Api')
     corporationid = models.BigIntegerField()
     corporationname = models.CharField(max_length=254)
+    characterid = models.BigIntegerField()
 
     def __unicode__(self):
         return self.corporationname
@@ -21,7 +23,10 @@ class CorporationApi(models.Model):
     #relation = models.ForeignKey("corporations.Corporation")
     #size = models.IntegerField(choices=settings.IMAGE_SIZES)
     #typeid = models.IntegerField(unique=True)
-    #icon = models.ImageField(upload_to="images/corporations/", storage=OverwriteStorage(), blank=True, null=True)
+    #icon = models.ImageField(
+        #upload_to="images/corporations/",
+        #storage=OverwriteStorage(),
+        #blank=True, null=True)
 
     #class Meta:
         #unique_together = ["size", "relation"]

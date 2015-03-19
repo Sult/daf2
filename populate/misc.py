@@ -1,5 +1,5 @@
 import eveapi
-from apps.apies.models import CallGroup, Call
+from apps.apies.models import CallGroup, Call, Api
 from apps.characters.models import RefType
 
 api = eveapi.EVEAPIConnection()
@@ -34,6 +34,22 @@ def calls():
             )
         except:
             print "Some shit didnt work dude"
+    # extra = []
+    # for call in extra:
+    #     Call.objects.create(
+    #         accessmask=call.accessMask,
+    #         accounttype=Api.CHARACTER,
+    #         name=call.name,
+    #         callgroup=CallGroup.objects.get(groupid=call.groupID),
+    #         description=call.description,
+    #     )
+    #     Call.objects.create(
+    #         accessmask=call.accessMask,
+    #         accounttype=Api.CORPORATION,
+    #         name=call.name,
+    #         callgroup=CallGroup.objects.get(groupid=call.groupID),
+    #         description=call.description,
+    #     )
 
 
 def reftypes():
